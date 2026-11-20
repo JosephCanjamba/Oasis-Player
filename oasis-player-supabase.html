@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oasis Player — Cloud Gaming & Streaming de Jogos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    body { background-color: #090b10; color: #f8fafc; overflow-x: hidden; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .hero-gradient {
+      background: linear-gradient(90deg, #090b10 0%, rgba(9,11,16,0.92) 38%, rgba(9,11,16,0.35) 75%, rgba(9,11,16,0.15) 100%),
+                  linear-gradient(0deg, #090b10 0%, rgba(9,11,16,0.75) 22%, rgba(9,11,16,0) 60%);
+    }
+    .glass {
+      background: rgba(15, 20, 32, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .game-card {
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+    }
+    .game-card:hover {
+      transform: scale(1.06) translateY(-4px);
+      z-index: 20;
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(16, 185, 129, 0.45);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.35); }
+      50% { box-shadow: 0 0 28px rgba(16, 185, 129, 0.7); }
+    }
+    .glow-emerald { animation: pulseGlow 2.6s infinite; }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-emerald-500 selection:text-slate-950">
+
+  <!-- ==================== TELA DE LOGIN / CADASTRO ==================== -->
+  <div id="authView" class="min-h-screen relative flex items-center justify-center p-4 bg-[#07090e]">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-600/20 rounded-full blur-[130px]"></div>
+      <div class="absolute bottom-0 right-0 w-[30rem] h-[30rem] bg-cyan-600/15 rounded-full blur-[140px]"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:28px_28px] opacity-25"></div>
+    </div>
+
+    <div class="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden glass shadow-2xl">
+      <!-- Lado Esquerdo: Apresentação -->
+      <div class="lg:col-span-6 p-8 md:p-12 bg-gradient-to-br from-emerald-950/70 via-slate-900/90 to-slate-950 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/10">
+        <div>
+          <div class="flex items-center gap-3 mb-8">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+              <svg class="w-6 h-6 text-slate-950" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div>
+              <span class="text-2xl font-black tracking-tight text-white">OASIS <span class="text-emerald-400">PLAYER</span></span>
+              <p class="text-[11px] uppercase tracking-widest text-emerald-300/80 font-semibold">Cloud Gaming Platform</p>
+            </div>
+          </div>
+
+          <h1 class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-4">
+            Jogue títulos AAA direto da nuvem, sem downloads.
+          </h1>
+          <p class="text-slate-300 text-sm md:text-base leading-relaxed mb-8">
+            Acesse servidores de alta performance com GPUs dedicadas RTX, catálogo estilo Netflix e baixa latência em qualquer navegador ou dispositivo.
+          </p>
+
+          <div class="space-y-3 text-sm text-slate-300">
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+              <span>Streaming instantâneo em até 4K 120FPS</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+              <span>Servidores Cloud globais e regionais de baixa latência</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+              <span>Contas e sessões sincronizadas via Supabase</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+          <span>Status da Rede: <strong class="text-emerald-400">● 99.98% Online</strong></span>
+          <span>Supabase Auth Ativo</span>
+        </div>
+      </div>
+
+      <!-- Lado Direito: Formulários -->
+      <div class="lg:col-span-6 p-8 md:p-12 bg-slate-950/80 flex flex-col justify-center">
+        <div class="flex p-1 rounded-xl bg-slate-900 border border-white/5 mb-7">
+          <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-sm font-bold rounded-lg bg-emerald-500 text-slate-950 transition">
+            Entrar
+          </button>
+          <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition">
+            Criar Conta
+          </button>
+        </div>
+
+        <div id="authAlert" class="hidden mb-4 p-3 rounded-xl text-xs font-medium"></div>
+
+        <!-- Form Login -->
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">E-mail</label>
+            <input id="loginEmail" type="email" required placeholder="jogador@oasisplayer.com"
+              class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Senha</label>
+            <input id="loginPassword" type="password" required placeholder="••••••••"
+              class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition" />
+          </div>
+          <button type="submit" class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm tracking-wide transition shadow-lg shadow-emerald-500/25">
+            Entrar no Oasis Player
+          </button>
+        </form>
+
+        <!-- Form Cadastro -->
+        <form id="registerForm" onsubmit="handleRegister(event)" class="hidden space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Gamer Tag / Nome</label>
+            <input id="regName" type="text" required placeholder="Ex: OasisRunner"
+              class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">E-mail</label>
+            <input id="regEmail" type="email" required placeholder="seu@email.com"
+              class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition" />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Senha</label>
+              <input id="regPassword" type="password" required minlength="6" placeholder="Mín. 6 caracteres"
+                class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Plano Cloud</label>
+              <select id="regPlan" class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white focus:outline-none focus:border-emerald-500 transition">
+                <option value="Starter Free (1080p 60fps)">Starter Free (1080p)</option>
+                <option value="Oasis Pro (2K 120fps)">Oasis Pro (2K RTX)</option>
+                <option value="Oasis Ultra (4K 120fps)">Oasis Ultra (4K RTX)</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm tracking-wide transition shadow-lg shadow-emerald-500/25">
+            Criar Conta Gratuita
+          </button>
+        </form>
+
+        <div class="my-6 flex items-center gap-3">
+          <div class="h-px flex-1 bg-white/10"></div>
+          <span class="text-xs text-slate-500 uppercase">ou</span>
+          <div class="h-px flex-1 bg-white/10"></div>
+        </div>
+
+        <button onclick="demoLogin()" class="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-semibold text-sm transition flex items-center justify-center gap-2">
+          <span>⚡</span> Acesso Rápido Demo (Conta VIP)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PLATAFORMA PRINCIPAL (CATÁLOGO NETFLIX) ==================== -->
+  <div id="appView" class="hidden min-h-screen flex flex-col">
+
+    <!-- Navbar Fixa -->
+    <header id="navbar" class="fixed top-0 inset-x-0 z-40 transition-all duration-300 bg-gradient-to-b from-black/90 via-black/60 to-transparent">
+      <div class="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-8">
+          <a href="#" onclick="resetFilters()" class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-400 flex items-center justify-center shadow-md shadow-emerald-500/30">
+              <svg class="w-5 h-5 text-slate-950" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <span class="text-xl font-black tracking-tight text-white">OASIS <span class="text-emerald-400">PLAYER</span></span>
+          </a>
+
+          <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+            <button onclick="filterCategory('Todos')" class="hover:text-white transition text-white font-semibold">Início</button>
+            <button onclick="filterCategory('Ação & RPG')" class="hover:text-white transition">Ação & RPG</button>
+            <button onclick="filterCategory('Corrida & Esportes')" class="hover:text-white transition">Corrida</button>
+            <button onclick="filterCategory('Arcade Cloud')" class="hover:text-white transition">Jogáveis Agora</button>
+            <button onclick="filterCategory('Minha Lista')" class="hover:text-white transition">Minha Lista</button>
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="relative hidden sm:block">
+            <input id="searchInput" oninput="handleSearch(this.value)" type="text" placeholder="Buscar jogos, gêneros..."
+              class="w-48 lg:w-64 pl-9 pr-4 py-2 rounded-full bg-slate-900/85 border border-white/10 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition" />
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 10.82a5.83 5.83 0 11-11.66 0 5.83 5.83 0 0111.66 0z"/>
+            </svg>
+          </div>
+
+          <button onclick="openServerModal()" class="flex items-center gap-2 px-3 py-2 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-emerald-500/30 text-xs font-semibold text-emerald-300 transition">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="navServerName" class="hidden lg:inline">África Austral</span>
+            <span id="navServerPing" class="text-white font-bold">24ms</span>
+          </button>
+
+          <div class="flex items-center gap-2 pl-2 border-l border-white/10">
+            <div class="text-right hidden sm:block">
+              <p id="userNameDisplay" class="text-xs font-bold text-white leading-none">Jogador</p>
+              <p id="userPlanDisplay" class="text-[10px] text-emerald-400 mt-0.5">Oasis Ultra</p>
+            </div>
+            <button onclick="logout()" title="Sair da conta" class="p-2 rounded-full bg-white/5 hover:bg-red-500/20 text-slate-300 hover:text-red-400 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Banner Estilo Netflix -->
+    <section id="heroSection" class="relative h-[78vh] min-h-[540px] w-full flex items-end pb-16 pt-28 overflow-hidden">
+      <img id="heroBg" src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1920&q=80" alt="Destaque"
+        class="absolute inset-0 w-full h-full object-cover object-center scale-105 transition-all duration-700" />
+      <div class="hero-gradient absolute inset-0"></div>
+
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 w-full">
+        <div class="max-w-2xl">
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <span class="px-2.5 py-1 rounded-md bg-emerald-500 text-slate-950 text-[11px] font-black uppercase tracking-wider">Top #1 na Nuvem</span>
+            <span id="heroTag" class="px-2.5 py-1 rounded-md bg-white/10 backdrop-blur text-xs font-semibold text-slate-200">RTX 4080 Cloud • 4K 120FPS</span>
+          </div>
+
+          <h1 id="heroTitle" class="text-4xl sm:text-6xl font-black text-white tracking-tight mb-4">
+            Cyber Odyssey 2099
+          </h1>
+
+          <p id="heroDesc" class="text-slate-300 text-sm sm:text-base leading-relaxed mb-6 line-clamp-3">
+            Explore uma metrópole futurista hiperconectada sem precisar baixar 140 GB. Renderizado em tempo real nos servidores Oasis Cloud com Ray Tracing ativado.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button id="heroPlayBtn" onclick="launchGame(featuredGameId)" class="px-7 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm flex items-center gap-2.5 transition shadow-xl shadow-emerald-500/30 glow-emerald">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Jogar na Nuvem Agora
+            </button>
+            <button id="heroListBtn" onclick="toggleMyList(featuredGameId)" class="px-6 py-3.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur text-white font-bold text-sm flex items-center gap-2 transition">
+              <span>+</span> Minha Lista
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filtros Rápidos / Categorias -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 -mt-4 mb-6 relative z-20 flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+      <button onclick="filterCategory('Todos')" data-cat="Todos" class="cat-pill px-4 py-2 rounded-full text-xs font-bold bg-emerald-500 text-slate-950 whitespace-nowrap transition">Todos os Jogos</button>
+      <button onclick="filterCategory('Arcade Cloud')" data-cat="Arcade Cloud" class="cat-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-white/10 whitespace-nowrap transition">🎮 Jogos Jogáveis no Browser</button>
+      <button onclick="filterCategory('Ação & RPG')" data-cat="Ação & RPG" class="cat-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-white/10 whitespace-nowrap transition">⚔️ Ação & RPG</button>
+      <button onclick="filterCategory('Corrida & Esportes')" data-cat="Corrida & Esportes" class="cat-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-white/10 whitespace-nowrap transition">🏎️ Corrida & Esportes</button>
+      <button onclick="filterCategory('Sci-Fi & Estratégia')" data-cat="Sci-Fi & Estratégia" class="cat-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-white/10 whitespace-nowrap transition">🚀 Sci-Fi & Estratégia</button>
+      <button onclick="filterCategory('Minha Lista')" data-cat="Minha Lista" class="cat-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-white/10 whitespace-nowrap transition">❤️ Minha Lista</button>
+    </div>
+
+    <!-- Container Dinâmico dos Carrosséis -->
+    <main id="catalogContainer" class="max-w-7xl mx-auto px-4 sm:px-8 w-full space-y-10 pb-20 flex-1"></main>
+
+    <!-- Rodapé -->
+    <footer class="border-t border-white/10 bg-slate-950/90 py-8 px-4 sm:px-8 text-xs text-slate-400">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <span class="font-black text-white">OASIS <span class="text-emerald-400">PLAYER</span></span>
+          <span>• Plataforma de Streaming de Jogos na Nuvem</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <button onclick="openServerModal()" class="hover:text-emerald-400 transition">Status dos Servidores</button>
+          <span>Latência Otimizada WebRTC</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================== MODAL DE SERVIDORES CLOUD ==================== -->
+  <div id="serverModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h3 class="text-xl font-extrabold text-white">Servidores Oasis Cloud</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Escolha o datacenter mais próximo para menor latência</p>
+        </div>
+        <button onclick="closeServerModal()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">✕</button>
+      </div>
+
+      <div id="serverList" class="space-y-3 mb-6"></div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-white/10">
+        <button onclick="pingAllServers()" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition">
+          🔄 Testar Ping Novamente
+        </button>
+        <button onclick="closeServerModal()" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-extrabold text-slate-950 transition">
+          Confirmar Servidor
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PLAYER DE STREAMING CLOUD ==================== -->
+  <div id="streamModal" class="hidden fixed inset-0 z-50 bg-black flex flex-col">
+    <div class="h-14 px-4 sm:px-6 bg-slate-950/95 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[11px] font-bold border border-emerald-500/30">● STREAMING ATIVO</span>
+        <h4 id="streamGameTitle" class="font-bold text-sm sm:text-base text-white">Jogo</h4>
+      </div>
+
+      <div class="hidden md:flex items-center gap-6 text-xs text-slate-300 font-mono">
+        <span>SERVIDOR: <strong id="streamServer" class="text-emerald-400">JNB-01</strong></span>
+        <span>PING: <strong id="streamPing" class="text-emerald-400">22 ms</strong></span>
+        <span>FPS: <strong id="streamFps" class="text-cyan-400">120</strong></span>
+        <span>BITRATE: <strong id="streamBitrate" class="text-purple-400">42.5 Mbps</strong></span>
+      </div>
+
+      <button onclick="closeStream()" class="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition">
+        Encerrar Sessão
+      </button>
+    </div>
+
+    <div class="flex-1 relative flex items-center justify-center bg-[#05070b] overflow-hidden p-4">
+      <div id="streamConnecting" class="text-center max-w-md">
+        <div class="w-16 h-16 mx-auto mb-5 rounded-2xl border-4 border-emerald-500/30 border-t-emerald-400 animate-spin"></div>
+        <h3 id="connectStepTitle" class="text-xl font-extrabold text-white mb-2">Alocando GPU na Nuvem...</h3>
+        <p id="connectStepDesc" class="text-xs text-slate-400 mb-4">Conectando ao nó NVIDIA RTX Pod mais próximo...</p>
+        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+          <div id="connectProgress" class="bg-emerald-500 h-full w-1/4 transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <div id="streamCanvasWrapper" class="hidden w-full max-w-4xl flex flex-col items-center">
+        <div class="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-slate-900">
+          <canvas id="cloudCanvas" width="960" height="540" class="w-full h-full block"></canvas>
+          <div id="canvasOverlayMsg" class="absolute inset-0 bg-black/65 flex flex-col items-center justify-center text-center p-6">
+            <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold mb-3">Sessão Cloud Conectada</span>
+            <h3 id="overlayGameName" class="text-2xl sm:text-3xl font-black text-white mb-2">Pronto para Jogar</h3>
+            <p id="overlayControls" class="text-xs sm:text-sm text-slate-300 max-w-md mb-6">Use as setas do teclado ou W A S D para controlar.</p>
+            <button onclick="startMiniGameLoop()" class="px-7 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm transition">
+              ▶ Iniciar Partida
+            </button>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center justify-between w-full text-xs text-slate-400">
+          <span id="gameScoreLabel" class="font-bold text-emerald-400 text-sm">Pontuação: 0</span>
+          <span>Controles: Setas / WASD • Espaço para ação</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS DA PLATAFORMA ==================== -->
+  <script>
+    // --- CONFIGURAÇÃO SUPABASE ---
+    const SUPABASE_URL = 'https://lldsoxpnztwnguwtjvad.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_OvOJVKAvcVLMH5t8ud8UgQ_S44u_5M7';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // --- BANCO DE DADOS DE SERVIDORES ---
+    const SERVERS = [
+      { id: 'jnb-01', name: 'África Austral (Joanesburgo)', gpu: 'NVIDIA RTX 4080 Pod', basePing: 24, load: '32%' },
+      { id: 'gru-01', name: 'América do Sul (São Paulo)', gpu: 'NVIDIA RTX 4090 Pod', basePing: 48, load: '45%' },
+      { id: 'mad-01', name: 'Europa Sul (Madrid / Lisboa)', gpu: 'NVIDIA RTX 4080 Pod', basePing: 76, load: '28%' },
+      { id: 'iad-01', name: 'América do Norte (Virginia)', gpu: 'NVIDIA L40S Cloud', basePing: 118, load: '51%' }
+    ];
+
+    let selectedServer = { ...SERVERS[0], currentPing: SERVERS[0].basePing };
+
+    // --- CATÁLOGO DE JOGOS ---
+    const GAMES = [
+      {
+        id: 'cyber-odyssey',
+        title: 'Cyber Odyssey 2099',
+        category: 'Ação & RPG',
+        rating: '98% Relevante',
+        age: '18+',
+        resolution: '4K • 120 FPS',
+        playableMode: 'shooter',
+        featured: true,
+        image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1000&q=80',
+        desc: 'Explore uma metrópole futurista hiperconectada sem precisar baixar 140 GB. Renderizado em tempo real nos servidores Oasis Cloud.'
+      },
+      {
+        id: 'neon-drift',
+        title: 'Neon Velocity: Apex Drift',
+        category: 'Corrida & Esportes',
+        rating: '96% Relevante',
+        age: '12+',
+        resolution: '4K • 120 FPS',
+        playableMode: 'racer',
+        featured: false,
+        image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1000&q=80',
+        desc: 'Corridas noturnas em alta velocidade com física realista e reflexos Ray Tracing direto no navegador.'
+      },
+      {
+        id: 'star-vanguard',
+        title: 'Star Vanguard: Nebulosa',
+        category: 'Sci-Fi & Estratégia',
+        rating: '95% Relevante',
+        age: '14+',
+        resolution: '2K • 120 FPS',
+        playableMode: 'shooter',
+        featured: false,
+        image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=1000&q=80',
+        desc: 'Comande sua nave interceptadora contra frotas alienígenas em batalhas espaciais épicas na nuvem.'
+      },
+      {
+        id: 'cyber-pong',
+        title: 'Cyber Pulse Arena',
+        category: 'Arcade Cloud',
+        rating: '99% Relevante',
+        age: 'Livre',
+        resolution: '1080p • 120 FPS',
+        playableMode: 'pong',
+        featured: false,
+        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=80',
+        desc: 'Duelo arcade futurista de reflexos ultrarrápidos. Teste a baixa latência do servidor Oasis Cloud agora mesmo.'
+      },
+      {
+        id: 'shadow-blades',
+        title: 'Shadow Blades: Ronin',
+        category: 'Ação & RPG',
+        rating: '97% Relevante',
+        age: '16+',
+        resolution: '4K • 60 FPS',
+        playableMode: 'shooter',
+        featured: false,
+        image: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1000&q=80',
+        desc: 'Combate tático de espadas no Japão feudal com iluminação dinâmica e zero tempo de instalação.'
+      },
+      {
+        id: 'street-striker',
+        title: 'Oasis Football 26',
+        category: 'Corrida & Esportes',
+        rating: '94% Relevante',
+        age: 'Livre',
+        resolution: '4K • 120 FPS',
+        playableMode: 'pong',
+        featured: false,
+        image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1000&q=80',
+        desc: 'Partidas competitivas online com estádios lotados e resposta instantânea nos controles.'
+      },
+      {
+        id: 'orbit-runner',
+        title: 'Turbo Highway 2088',
+        category: 'Arcade Cloud',
+        rating: '93% Relevante',
+        age: '10+',
+        resolution: '1080p • 120 FPS',
+        playableMode: 'racer',
+        featured: false,
+        image: 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=1000&q=80',
+        desc: 'Desvie do tráfego em rodovias cibernéticas a mais de 400 km/h diretamente pelo stream.'
+      },
+      {
+        id: 'galactic-core',
+        title: 'Galactic Defender X',
+        category: 'Arcade Cloud',
+        rating: '95% Relevante',
+        age: 'Livre',
+        resolution: '1080p • 120 FPS',
+        playableMode: 'shooter',
+        featured: false,
+        image: 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?auto=format&fit=crop&w=1000&q=80',
+        desc: 'Defenda a estação orbital contra ondas de meteoros e drones inimigos sem instalar nada.'
+      }
+    ];
+
+    let featuredGameId = GAMES[0].id;
+    let currentCategory = 'Todos';
+    let searchQuery = '';
+    let currentUser = null;
+    let myList = [];
+
+    // --- INICIALIZAÇÃO & SESSÃO SUPABASE ---
+    window.addEventListener('DOMContentLoaded', async () => {
+      renderServers();
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session && session.user) {
+          const meta = session.user.user_metadata || {};
+          currentUser = {
+            name: meta.gamer_tag || session.user.email.split('@')[0],
+            email: session.user.email,
+            plan: meta.plan || 'Starter Free (1080p 60fps)',
+            myList: meta.myList || ['cyber-odyssey', 'cyber-pong']
+          };
+          enterPlatform();
+        }
+      } catch (err) {
+        console.error('Erro ao verificar sessão Supabase:', err);
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('navbar');
+      if (window.scrollY > 30) {
+        nav.classList.add('bg-slate-950/95', 'shadow-lg', 'border-b', 'border-white/5');
+      } else {
+        nav.classList.remove('bg-slate-950/95', 'shadow-lg', 'border-b', 'border-white/5');
+      }
+    });
+
+    // --- AUTENTICAÇÃO ---
+    function switchAuthTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
+      document.getElementById('registerForm').classList.toggle('hidden', isLogin);
+
+      document.getElementById('tabLogin').className = isLogin
+        ? 'flex-1 py-2.5 text-sm font-bold rounded-lg bg-emerald-500 text-slate-950 transition'
+        : 'flex-1 py-2.5 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition';
+
+      document.getElementById('tabRegister').className = !isLogin
+        ? 'flex-1 py-2.5 text-sm font-bold rounded-lg bg-emerald-500 text-slate-950 transition'
+        : 'flex-1 py-2.5 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition';
+
+      hideAuthAlert();
+    }
+
+    function showAuthAlert(msg, isError = true) {
+      const el = document.getElementById('authAlert');
+      el.textContent = msg;
+      el.className = `mb-4 p-3 rounded-xl text-xs font-semibold ${
+        isError ? 'bg-red-500/15 text-red-300 border border-red-500/30' : 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+      }`;
+      el.classList.remove('hidden');
+    }
+
+    function hideAuthAlert() {
+      document.getElementById('authAlert').classList.add('hidden');
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      hideAuthAlert();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const plan = document.getElementById('regPlan').value;
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            gamer_tag: name,
+            plan: plan,
+            myList: ['cyber-odyssey', 'cyber-pong']
+          }
+        }
+      });
+
+      if (error) {
+        showAuthAlert('Erro ao criar conta: ' + error.message, true);
+        return;
+      }
+
+      if (data.session && data.user) {
+        currentUser = {
+          name,
+          email,
+          plan,
+          myList: ['cyber-odyssey', 'cyber-pong']
+        };
+        enterPlatform();
+      } else {
+        showAuthAlert('Conta criada! Verifique seu e-mail para confirmar (ou desative "Confirm email" no Supabase para entrar na hora).', false);
+        switchAuthTab('login');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideAuthAlert();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        showAuthAlert('Falha no login: ' + error.message, true);
+        return;
+      }
+
+      const meta = data.user.user_metadata || {};
+      currentUser = {
+        name: meta.gamer_tag || email.split('@')[0],
+        email: data.user.email,
+        plan: meta.plan || 'Starter Free (1080p 60fps)',
+        myList: meta.myList || ['cyber-odyssey', 'cyber-pong']
+      };
+      enterPlatform();
+    }
+
+    function demoLogin() {
+      currentUser = {
+        name: 'Player_VIP',
+        email: 'vip@oasisplayer.com',
+        plan: 'Oasis Ultra (4K 120fps)',
+        myList: ['cyber-odyssey', 'neon-drift', 'cyber-pong'],
+        isDemo: true
+      };
+      enterPlatform();
+    }
+
+    async function logout() {
+      if (currentUser && !currentUser.isDemo) {
+        await supabaseClient.auth.signOut();
+      }
+      currentUser = null;
+      document.getElementById('appView').classList.add('hidden');
+      document.getElementById('authView').classList.remove('hidden');
+    }
+
+    function enterPlatform() {
+      myList = currentUser.myList || [];
+      document.getElementById('userNameDisplay').textContent = currentUser.name;
+      document.getElementById('userPlanDisplay').textContent = currentUser.plan.split('(')[0].trim();
+      document.getElementById('authView').classList.add('hidden');
+      document.getElementById('appView').classList.remove('hidden');
+      updateHero(GAMES[0]);
+      renderCatalog();
+    }
+
+    // --- CATÁLOGO ESTILO NETFLIX ---
+    function updateHero(game) {
+      featuredGameId = game.id;
+      document.getElementById('heroBg').src = game.image;
+      document.getElementById('heroTitle').textContent = game.title;
+      document.getElementById('heroDesc').textContent = game.desc;
+      document.getElementById('heroTag').textContent = `RTX 4080 Cloud • ${game.resolution}`;
+      const inList = myList.includes(game.id);
+      document.getElementById('heroListBtn').innerHTML = inList ? '✓ Na Minha Lista' : '<span>+</span> Minha Lista';
+    }
+
+    async function toggleMyList(gameId) {
+      if (myList.includes(gameId)) {
+        myList = myList.filter(id => id !== gameId);
+      } else {
+        myList.push(gameId);
+      }
+      currentUser.myList = myList;
+
+      if (currentUser && !currentUser.isDemo) {
+        await supabaseClient.auth.updateUser({ data: { myList } }).catch(() => {});
+      }
+
+      updateHero(GAMES.find(g => g.id === featuredGameId) || GAMES[0]);
+      renderCatalog();
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        const active = btn.dataset.cat === cat;
+        btn.className = active
+          ? 'cat-pill px-4 py-2 rounded-full text-xs font-bold bg-emerald-500 text-slate-950 whitespace-nowrap transition'
+          : 'cat-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-white/10 whitespace-nowrap transition';
+      });
+      renderCatalog();
+    }
+
+    function resetFilters() {
+      searchQuery = '';
+      const input = document.getElementById('searchInput');
+      if (input) input.value = '';
+      filterCategory('Todos');
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.trim().toLowerCase();
+      renderCatalog();
+    }
+
+    function createGameCard(game) {
+      const inList = myList.includes(game.id);
+      return `
+        <div onclick="updateHero(GAMES.find(g => g.id === '${game.id}'))"
+          class="game-card group relative rounded-2xl overflow-hidden bg-slate-900 border border-white/10 cursor-pointer flex flex-col">
+          <div class="relative aspect-video overflow-hidden">
+            <img src="${game.image}" alt="${game.title}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-black/75 backdrop-blur text-[10px] font-bold text-emerald-400 border border-emerald-500/30">
+              ${game.resolution}
+            </span>
+            <button onclick="event.stopPropagation(); launchGame('${game.id}')"
+              class="opacity-0 group-hover:opacity-100 transition absolute inset-0 m-auto w-12 h-12 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center shadow-lg">
+              <svg class="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <h3 class="font-bold text-sm text-white group-hover:text-emerald-400 transition truncate">${game.title}</h3>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300 font-semibold">${game.age}</span>
+              </div>
+              <p class="text-[11px] text-emerald-400 font-semibold mb-2">${game.rating} • ${game.category}</p>
+              <p class="text-xs text-slate-400 line-clamp-2">${game.desc}</p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-2">
+              <button onclick="event.stopPropagation(); launchGame('${game.id}')"
+                class="flex-1 py-2 rounded-lg bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 text-xs font-extrabold transition">
+                ▶ Jogar
+              </button>
+              <button onclick="event.stopPropagation(); toggleMyList('${game.id}')"
+                class="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-bold text-white transition" title="Adicionar/Remover da Lista">
+                ${inList ? '✓' : '+'}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCatalog() {
+      const container = document.getElementById('catalogContainer');
+      let filtered = GAMES;
+
+      if (searchQuery) {
+        filtered = GAMES.filter(g =>
+          g.title.toLowerCase().includes(searchQuery) ||
+          g.category.toLowerCase().includes(searchQuery) ||
+          g.desc.toLowerCase().includes(searchQuery)
+        );
+        container.innerHTML = `
+          <section>
+            <h2 class="text-xl font-extrabold text-white mb-4">Resultados para "${searchQuery}" (${filtered.length})</h2>
+            ${filtered.length
+              ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">${filtered.map(createGameCard).join('')}</div>`
+              : `<p class="text-slate-400 text-sm">Nenhum jogo encontrado no catálogo.</p>`
+            }
+          </section>
+        `;
+        return;
+      }
+
+      if (currentCategory !== 'Todos') {
+        const list = currentCategory === 'Minha Lista'
+          ? GAMES.filter(g => myList.includes(g.id))
+          : GAMES.filter(g => g.category === currentCategory);
+
+        container.innerHTML = `
+          <section>
+            <h2 class="text-xl font-extrabold text-white mb-4">${currentCategory} (${list.length})</h2>
+            ${list.length
+              ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">${list.map(createGameCard).join('')}</div>`
+              : `<p class="text-slate-400 text-sm">Você ainda não adicionou jogos nesta seção.</p>`
+            }
+          </section>
+        `;
+        return;
+      }
+
+      const sections = [
+        { title: '🔥 Em Alta no Oasis Cloud', items: GAMES.slice(0, 4) },
+        { title: '🎮 Jogos Jogáveis Direto no Navegador', items: GAMES.filter(g => g.category === 'Arcade Cloud' || g.id === 'neon-drift') },
+        { title: '⚔️ Ação, Corrida & Sci-Fi AAA', items: GAMES.filter(g => g.category !== 'Arcade Cloud') }
+      ];
+
+      if (myList.length > 0) {
+        sections.unshift({
+          title: '❤️ Minha Lista',
+          items: GAMES.filter(g => myList.includes(g.id))
+        });
+      }
+
+      container.innerHTML = sections.map(sec => `
+        <section>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">${sec.title}</h2>
+            <span class="text-xs text-slate-400">${sec.items.length} títulos</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            ${sec.items.map(createGameCard).join('')}
+          </div>
+        </section>
+      `).join('');
+    }
+
+    // --- SERVIDORES CLOUD ---
+    function openServerModal() {
+      renderServers();
+      document.getElementById('serverModal').classList.remove('hidden');
+    }
+
+    function closeServerModal() {
+      document.getElementById('serverModal').classList.add('hidden');
+    }
+
+    function renderServers() {
+      const list = document.getElementById('serverList');
+      list.innerHTML = SERVERS.map(srv => {
+        const ping = srv.currentPing || srv.basePing;
+        const active = selectedServer.id === srv.id;
+        const pingColor = ping < 55 ? 'text-emerald-400' : ping < 95 ? 'text-amber-400' : 'text-red-400';
+        return `
+          <div onclick="selectServer('${srv.id}')"
+            class="p-4 rounded-2xl border cursor-pointer transition flex items-center justify-between ${
+              active ? 'bg-emerald-500/15 border-emerald-500' : 'bg-slate-900/80 border-white/10 hover:border-white/25'
+            }">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-sm text-white">${srv.name}</span>
+                ${active ? '<span class="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 text-[10px] font-black">ATIVO</span>' : ''}
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">${srv.gpu} • Carga: ${srv.load}</p>
+            </div>
+            <div class="text-right">
+              <span class="font-mono font-extrabold text-sm ${pingColor}">${ping} ms</span>
+              <p class="text-[10px] text-slate-500 uppercase">Latência</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectServer(id) {
+      const srv = SERVERS.find(s => s.id === id);
+      if (!srv) return;
+      selectedServer = { ...srv, currentPing: srv.currentPing || srv.basePing };
+      document.getElementById('navServerName').textContent = srv.name.split('(')[0].trim();
+      document.getElementById('navServerPing').textContent = `${selectedServer.currentPing}ms`;
+      renderServers();
+    }
+
+    function pingAllServers() {
+      SERVERS.forEach(s => {
+        const jitter = Math.floor(Math.random() * 9) - 4;
+        s.currentPing = Math.max(12, s.basePing + jitter);
+      });
+      selectServer(selectedServer.id);
+    }
+
+    // --- PLAYER DE STREAMING & MINI-JOGOS INTERATIVOS ---
+    let activeGame = null;
+    let gameLoopId = null;
+    let telemetryInterval = null;
+    let keys = {};
+
+    window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+    window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+    function launchGame(gameId) {
+      activeGame = GAMES.find(g => g.id === gameId) || GAMES[0];
+      document.getElementById('streamGameTitle').textContent = activeGame.title;
+      document.getElementById('streamServer').textContent = selectedServer.id.toUpperCase();
+      document.getElementById('streamModal').classList.remove('hidden');
+
+      document.getElementById('streamConnecting').classList.remove('hidden');
+      document.getElementById('streamCanvasWrapper').classList.add('hidden');
+      document.getElementById('canvasOverlayMsg').classList.remove('hidden');
+
+      const prog = document.getElementById('connectProgress');
+      const stepTitle = document.getElementById('connectStepTitle');
+      const stepDesc = document.getElementById('connectStepDesc');
+
+      prog.style.width = '25%';
+      stepTitle.textContent = 'Alocando GPU na Nuvem...';
+      stepDesc.textContent = `Conectando ao nó ${selectedServer.name}...`;
+
+      setTimeout(() => {
+        prog.style.width = '68%';
+        stepTitle.textContent = 'Iniciando Stream WebRTC 120FPS...';
+        stepDesc.textContent = 'Sincronizando controles e áudio espacial...';
+      }, 650);
+
+      setTimeout(() => {
+        prog.style.width = '100%';
+        document.getElementById('streamConnecting').classList.add('hidden');
+        document.getElementById('streamCanvasWrapper').classList.remove('hidden');
+        document.getElementById('overlayGameName').textContent = activeGame.title;
+        document.getElementById('overlayControls').textContent =
+          activeGame.playableMode === 'pong'
+            ? 'Use W/S ou Setas Cima/Baixo para rebater a esfera de energia contra a IA do servidor.'
+            : activeGame.playableMode === 'racer'
+            ? 'Use Setas Esquerda/Direita ou A/D para desviar dos veículos na pista neon.'
+            : 'Use Setas ou WASD para mover sua nave e Espaço para disparar lasers.';
+        startTelemetry();
+      }, 1350);
+    }
+
+    function startTelemetry() {
+      clearInterval(telemetryInterval);
+      telemetryInterval = setInterval(() => {
+        const jitter = Math.floor(Math.random() * 5) - 2;
+        document.getElementById('streamPing').textContent = `${Math.max(12, selectedServer.currentPing + jitter)} ms`;
+        document.getElementById('streamFps').textContent = `${118 + Math.floor(Math.random() * 3)}`;
+        document.getElementById('streamBitrate').textContent = `${(41 + Math.random() * 4).toFixed(1)} Mbps`;
+      }, 1000);
+    }
+
+    function closeStream() {
+      cancelAnimationFrame(gameLoopId);
+      clearInterval(telemetryInterval);
+      document.getElementById('streamModal').classList.add('hidden');
+    }
+
+    function startMiniGameLoop() {
+      document.getElementById('canvasOverlayMsg').classList.add('hidden');
+      cancelAnimationFrame(gameLoopId);
+
+      const canvas = document.getElementById('cloudCanvas');
+      const ctx = canvas.getContext('2d');
+      const mode = activeGame.playableMode;
+      let score = 0;
+
+      if (mode === 'pong') {
+        let playerY = 210, aiY = 210, ballX = 480, ballY = 270, vx = 6, vy = 4;
+        function loopPong() {
+          if (keys['w'] || keys['arrowup']) playerY = Math.max(10, playerY - 7);
+          if (keys['s'] || keys['arrowdown']) playerY = Math.min(420, playerY + 7);
+
+          ballX += vx; ballY += vy;
+          if (ballY < 12 || ballY > 528) vy *= -1;
+          aiY += ((ballY - 55) - aiY) * 0.08;
+
+          if (ballX < 42 && ballY > playerY && ballY < playerY + 110) {
+            vx = Math.abs(vx) + 0.3;
+            score += 10;
+          }
+          if (ballX > 918 && ballY > aiY && ballY < aiY + 110) {
+            vx = -Math.abs(vx);
+          }
+          if (ballX < 0 || ballX > 960) {
+            ballX = 480; ballY = 270; vx = 6 * (Math.random() > 0.5 ? 1 : -1);
+          }
+
+          ctx.fillStyle = '#070b14';
+          ctx.fillRect(0, 0, 960, 540);
+          ctx.strokeStyle = 'rgba(16,185,129,0.2)';
+          ctx.setLineDash([10, 10]);
+          ctx.beginPath(); ctx.moveTo(480, 0); ctx.lineTo(480, 540); ctx.stroke();
+          ctx.setLineDash([]);
+
+          ctx.fillStyle = '#10b981';
+          ctx.fillRect(24, playerY, 14, 110);
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillRect(922, aiY, 14, 110);
+
+          ctx.beginPath();
+          ctx.arc(ballX, ballY, 11, 0, Math.PI * 2);
+          ctx.fillStyle = '#f8fafc';
+          ctx.fill();
+
+          document.getElementById('gameScoreLabel').textContent = `Pontuação: ${score}`;
+          gameLoopId = requestAnimationFrame(loopPong);
+        }
+        loopPong();
+      } else if (mode === 'racer') {
+        let carX = 455, obstacles = [], frame = 0;
+        function loopRacer() {
+          frame++;
+          if (keys['a'] || keys['arrowleft']) carX = Math.max(210, carX - 7);
+          if (keys['d'] || keys['arrowright']) carX = Math.min(700, carX + 7);
+
+          if (frame % 38 === 0) {
+            obstacles.push({ x: 220 + Math.random() * 470, y: -60, w: 46, h: 75 });
+          }
+
+          ctx.fillStyle = '#090d16';
+          ctx.fillRect(0, 0, 960, 540);
+          ctx.fillStyle = '#111827';
+          ctx.fillRect(200, 0, 560, 540);
+
+          ctx.strokeStyle = '#10b981';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(200, -5, 560, 550);
+
+          ctx.fillStyle = '#10b981';
+          ctx.fillRect(carX, 430, 46, 76);
+
+          obstacles.forEach((ob, idx) => {
+            ob.y += 7;
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
+            if (ob.y > 540) { obstacles.splice(idx, 1); score += 15; }
+            if (carX < ob.x + ob.w && carX + 46 > ob.x && 430 < ob.y + ob.h && 506 > ob.y) {
+              obstacles = []; score = 0;
+            }
+          });
+
+          document.getElementById('gameScoreLabel').textContent = `Pontuação: ${score}`;
+          gameLoopId = requestAnimationFrame(loopRacer);
+        }
+        loopRacer();
+      } else {
+        let shipX = 460, bullets = [], enemies = [], frame = 0, cooldown = 0;
+        function loopShooter() {
+          frame++;
+          if (cooldown > 0) cooldown--;
+          if (keys['a'] || keys['arrowleft']) shipX = Math.max(30, shipX - 7);
+          if (keys['d'] || keys['arrowright']) shipX = Math.min(890, shipX + 7);
+          if (keys[' '] && cooldown === 0) {
+            bullets.push({ x: shipX + 18, y: 455 });
+            cooldown = 12;
+          }
+          if (frame % 45 === 0) {
+            enemies.push({ x: 40 + Math.random() * 840, y: -30, r: 20 });
+          }
+
+          ctx.fillStyle = '#060913';
+          ctx.fillRect(0, 0, 960, 540);
+
+          ctx.fillStyle = '#10b981';
+          ctx.beginPath();
+          ctx.moveTo(shipX + 20, 450);
+          ctx.lineTo(shipX, 495);
+          ctx.lineTo(shipX + 40, 495);
+          ctx.closePath();
+          ctx.fill();
+
+          bullets.forEach((b, bi) => {
+            b.y -= 10;
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(b.x, b.y, 4, 14);
+            if (b.y < 0) bullets.splice(bi, 1);
+          });
+
+          enemies.forEach((en, ei) => {
+            en.y += 3.2;
+            ctx.fillStyle = '#a855f7';
+            ctx.beginPath();
+            ctx.arc(en.x, en.y, en.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            bullets.forEach((b, bi) => {
+              if (Math.hypot(b.x - en.x, b.y - en.y) < en.r + 6) {
+                enemies.splice(ei, 1);
+                bullets.splice(bi, 1);
+                score += 25;
+              }
+            });
+            if (en.y > 560) enemies.splice(ei, 1);
+          });
+
+          document.getElementById('gameScoreLabel').textContent = `Pontuação: ${score}`;
+          gameLoopId = requestAnimationFrame(loopShooter);
+        }
+        loopShooter();
+      }
+    }
+  </script>
+</body>
+</html>
